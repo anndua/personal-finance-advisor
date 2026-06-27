@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from app.predictor import predict_risk
 from app.portfolio import recommend_portfolio
 from app.sip import calculate_sip
-from app.schemas import SIPRequest
+#from app.schemas import SIPRequest
+from app.schemas import RiskRequest, SIPRequest
 
 app = FastAPI(
     title="Personal Finance & Mutual Fund Advisor API",
@@ -17,10 +18,24 @@ def home():
 def health():
     return {"status": "OK"}
 
+
+
 @app.post("/predict-risk")
-def predict(data: dict):
-    risk = predict_risk(data)
+def predict(data: RiskRequest):
+
+    risk = predict_risk(data.model_dump())
+
     portfolio = recommend_portfolio(risk)
+
+    return {
+        "risk_profile": risk,
+        "portfolio": {
+            "equity": portfolio["equity"],
+            "debt": portfolio["debt"],
+            "gold": portfolio["gold"]
+        },
+        "recommended_funds": portfolio["recommended_funds"]
+    }
 
 @app.post("/calculate-sip")
 def sip(data: SIPRequest):
