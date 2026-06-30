@@ -4,8 +4,15 @@ import {
   FaMoneyBillWave,
   FaBullseye,
   FaBriefcase,
-  FaSignOutAlt
+  FaSignOutAlt,
 } from "react-icons/fa";
+
+const links = [
+  { to: "/dashboard", label: "Dashboard",  icon: <FaChartPie /> },
+  { to: "/expenses",  label: "Expenses",   icon: <FaMoneyBillWave /> },
+  { to: "/goals",     label: "Goals",      icon: <FaBullseye /> },
+  { to: "/portfolio", label: "Portfolio",  icon: <FaBriefcase /> },
+];
 
 const Sidebar = () => {
   const logout = () => {
@@ -13,46 +20,45 @@ const Sidebar = () => {
     window.location.href = "/";
   };
 
-  const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-      isActive
-        ? "bg-[#e6f2f0] text-[#1a6b5e]"
-        : "text-slate-600 hover:bg-slate-100"
-    }`;
-
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 min-h-screen p-6">
-      <h1 className="text-2xl font-bold text-[#1a6b5e] mb-10">
-        FinlyAI
-      </h1>
+    <aside className="w-64 bg-brand-600 min-h-screen flex flex-col py-8 px-5 shrink-0">
+      {/* Logo */}
+      <div className="mb-10 px-2">
+        <span className="text-2xl font-bold text-white tracking-tight">
+          Finly<span className="text-gold-400">AI</span>
+        </span>
+        <p className="text-brand-200 text-xs mt-0.5 font-medium tracking-wide uppercase">
+          Finance Advisor
+        </p>
+      </div>
 
-      <nav className="space-y-3">
-        <NavLink to="/dashboard" className={linkClass}>
-          <FaChartPie />
-          Dashboard
-        </NavLink>
-
-        <NavLink to="/expenses" className={linkClass}>
-          <FaMoneyBillWave />
-          Expenses
-        </NavLink>
-
-        <NavLink to="/goals" className={linkClass}>
-          <FaBullseye />
-          Goals
-        </NavLink>
-
-        <NavLink to="/portfolio" className={linkClass}>
-          <FaBriefcase />
-          Portfolio
-        </NavLink>
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1">
+        {links.map(({ to, label, icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-white/15 text-white shadow-sm"
+                  : "text-brand-200 hover:bg-white/10 hover:text-white"
+              }`
+            }
+          >
+            <span className="text-base">{icon}</span>
+            {label}
+          </NavLink>
+        ))}
       </nav>
 
+      {/* Logout */}
       <button
         onClick={logout}
-        className="mt-12 flex items-center gap-3 text-red-500"
+        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+                   text-brand-200 hover:bg-white/10 hover:text-white transition-all mt-4"
       >
-        <FaSignOutAlt />
+        <FaSignOutAlt className="text-base" />
         Logout
       </button>
     </aside>

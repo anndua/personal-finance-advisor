@@ -1,16 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Expenses from "./pages/Expenses";
-import Goals from "./pages/Goals";
-import Portfolio from "./pages/Portfolio";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import Auth from "./Pages/Auth";
+import Dashboard from "./Pages/Dashboard";
+import Expenses from "./Pages/Expenses";
+import Goals from "./Pages/Goals";
+import Portfolio from "./Pages/Portfolio";
+import ProtectedRoute from "./Routes/ProtectedRoute";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<Auth />} />
 
         <Route
@@ -48,7 +47,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );
