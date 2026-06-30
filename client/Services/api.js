@@ -1,11 +1,13 @@
 import axios from "axios";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 /**
  * Axios instance
- * Connects React frontend to FastAPI backend
+ * Connects React frontend to the deployed Netlify API.
  */
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL,
   headers: {
     "Content-Type": "application/json",
   },
