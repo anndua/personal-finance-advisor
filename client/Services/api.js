@@ -12,6 +12,16 @@ const api = axios.create({
 });
 
 /**
+ * Axios instance for ML service (port 8001)
+ */
+const mlApi = axios.create({
+  baseURL: "http://localhost:8001",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+/**
  * Attach JWT token automatically to every request
  */
 api.interceptors.request.use(
@@ -71,3 +81,12 @@ export const portfolioAPI = {
  * Optional: export axios instance for direct usage
  */
 export default api;
+
+/**
+ * ML SERVICE APIs (port 8001)
+ */
+export const mlAPI = {
+  predictRisk: (data) => mlApi.post("/predict-risk", data),
+  calculateSip: (data) => mlApi.post("/calculate-sip", data),
+  health: ()    => mlApi.get("/health"),
+};

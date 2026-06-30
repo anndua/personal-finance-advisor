@@ -36,8 +36,8 @@ async def login(user: UserLogin):
     if not verify_password(user.password, existing_user["password"]):
         return {"message": "Invalid password"}
     token = create_access_token(
-    {"email": existing_user["email"]}
-)
+        {"email": existing_user["email"], "name": existing_user.get("name", "")}
+    )
 
     return {
     "message": "Login successful",

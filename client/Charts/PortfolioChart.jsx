@@ -1,79 +1,169 @@
+import { useEffect, useState } from "react";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
+  PieChart, Pie, Cell, Tooltip,
+  ResponsiveContainer, Legend,
 } from "recharts";
+import { portfolioAPI } from "../Services/api";
+import { FaBrain } from "react-icons/fa";
 
-/* Static sample data — swap out for API data when ready */
-const data = [
-  { month: "Jan", value: 15000 },
-  { month: "Feb", value: 18000 },
-  { month: "Mar", value: 21000 },
-  { month: "Apr", value: 28000 },
-  { month: "May", value: 32000 },
-  { month: "Jun", value: 40000 },
-];
+const ASSET_COLORS = {
+  Stock:         "#1a6b5e",
+  "Mutual Fund": "#5c7cfa",
+  Gold:          "#d4a843",
+  Crypto:        "#a855f7",
+  "Real Estate": "#f97316",
+  Bond:          "#06b6d4",
+  FD:            "#ec4899",
+};
 
-const CustomTooltip = ({ active, payload, label }) => {
+const ALLOC_COLORS = { Equity: "#1a6b5e", Debt: "#d4a843", Gold: "#f59e0b" };
+
+const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-slate-100 rounded-xl shadow-card px-3 py-2 text-sm">
-      <p className="text-slate-500 text-xs mb-0.5">{label}</p>
+      <p className="text-slate-500 text-xs mb-0.5">{payload[0].name}</p>
       <p className="font-semibold text-brand-600">
-        ₹{Number(payload[0].value).toLocaleString()}
+        {payload[0].payload.isPercent
+          ? `${payload[0].value}%`
+          : `₹${Number(payload[0].value).toLocaleString("en-IN")}`}
       </p>
     </div>
   );
 };
 
 const PortfolioChart = () => {
+  const [portfolioData, setPortfolioData] = useState([]);
+  const [riskResult, setRiskResult]       = useState(null);
+  const [showMode, setShowMode]           = useState("holdings"); // "holdings" | "ai"
+
+  useEffect(() => {
+    // Load real portfolio holdings
+    portfolioAPI.getAll()
+      .then((res) => {
+        const items = res.data || [];
+        const map = items.reduce((acc, i) => {
+          const t = i.asset_type || "Other";
+          acc[t] = (acc[t] || 0) + (i.amount || 0);
+          return acc;
+        }, {});
+        setPortfolioData(
+          Object.entries(map).map(([name, value]) => ({ name, value }))
+        );
+      })
+      .catch(() => {});
+
+    // Load cached AI risk result
+    try {
+      const cached = localStorage.getItem("riskResult");
+      if (cached) setRiskResult(JSON.parse(cached));
+    } catch {}
+  }, []);
+
+  // Data for AI allocation view
+  const aiData = riskResult
+    ? [
+        { name: "Equity", value: riskResult.portfolio.equity, isPercent: true },
+        { name: "Debt",   value: riskResult.portfolio.debt,   isPercent: true },
+        { name: "Gold",   value: riskResult.portfolio.gold,   isPercent: true },
+      ]
+    : [];
+
+  const activeData   = showMode === "ai" ? aiData : portfolioData;
+  const activeColors = showMode === "ai" ? ALLOC_COLORS : ASSET_COLORS;
+  const isEmpty      = activeData.length === 0;
+
   return (
     <div className="card">
-      <h2 className="font-semibold text-slate-800 mb-1">Portfolio Growth</h2>
-      <p className="text-xs text-slate-400 mb-5">Value over the last 6 months</p>
+      <div className="flex items-start justify-between mb-1 gap-2">
+        <div>
+          <h2 className="font-semibold text-slate-800">
+            {showMode === "ai" ? "AI Recommended Allocation" : "Portfolio Breakdown"}
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            {showMode === "ai"
+              ? `Based on ${riskResult?.risk_profile} risk profile`
+              : "By asset type (invested amount)"}
+          </p>
+        </div>
 
-      <ResponsiveContainer width="100%" height={260}>
-        <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-          <defs>
-            <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%"  stopColor="#1a6b5e" stopOpacity={0.15} />
-              <stop offset="95%" stopColor="#1a6b5e" stopOpacity={0} />
-            </linearGradient>
-          </defs>
+        {/* Toggle between views if AI result exists */}
+        {riskResult && (
+          <div className="flex bg-slate-100 rounded-lg p-0.5 shrink-0">
+            <button
+              onClick={() => setShowMode("holdings")}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+                showMode === "holdings"
+                  ? "bg-white text-brand-600 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Holdings
+            </button>
+            <button
+              onClick={() => setShowMode("ai")}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+                showMode === "ai"
+                  ? "bg-white text-brand-600 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <FaBrain size={10} />
+              AI
+            </button>
+          </div>
+        )}
+      </div>
 
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+      {isEmpty ? (
+        <div className="h-64 flex flex-col items-center justify-center text-slate-300 gap-2">
+          <p className="text-sm">
+            {showMode === "ai"
+              ? "Run the AI Risk Profiler in Portfolio → AI Advisor"
+              : "No portfolio data yet"}
+          </p>
+        </div>
+      ) : (
+        <>
+          <ResponsiveContainer width="100%" height={240}>
+            <PieChart>
+              <Pie
+                data={activeData}
+                dataKey="value"
+                outerRadius={90}
+                innerRadius={48}
+                paddingAngle={3}
+                strokeWidth={0}
+              >
+                {activeData.map((entry) => (
+                  <Cell
+                    key={entry.name}
+                    fill={
+                      activeColors[entry.name] ??
+                      "#94a3b8"
+                    }
+                  />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                iconType="circle"
+                iconSize={8}
+                formatter={(v) => <span className="text-xs text-slate-600">{v}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
 
-          <XAxis
-            dataKey="month"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 11, fill: "#94a3b8" }}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 11, fill: "#94a3b8" }}
-            tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
-            width={48}
-          />
-
-          <Tooltip content={<CustomTooltip />} />
-
-          <Area
-            type="monotone"
-            dataKey="value"
-            stroke="#1a6b5e"
-            strokeWidth={2.5}
-            fill="url(#portfolioGradient)"
-            dot={{ fill: "#1a6b5e", r: 4, strokeWidth: 0 }}
-            activeDot={{ r: 6, fill: "#1a6b5e" }}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+          {/* AI risk badge */}
+          {showMode === "ai" && riskResult && (
+            <div className="mt-2 flex justify-center">
+              <span className="text-xs px-3 py-1 rounded-full bg-brand-50 text-brand-600 font-semibold">
+                {riskResult.risk_profile} Profile
+              </span>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

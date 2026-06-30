@@ -1,21 +1,15 @@
 import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 
-const ASSET_TYPES = ["Stock", "Crypto", "Mutual Fund", "Gold"];
+const ASSET_TYPES = ["Stock", "Mutual Fund", "Gold", "Crypto", "Real Estate", "Bond", "FD"];
 
-const defaultForm = {
-  name: "",
-  type: "Stock",
-  quantity: "",
-  buyPrice: "",
-  currentPrice: "",
-};
+const defaultForm = { asset_name: "", asset_type: "Stock", amount: "" };
 
 const PortfolioModal = ({ isOpen, onClose, onSave, item }) => {
   const [form, setForm] = useState(defaultForm);
 
   useEffect(() => {
-    setForm(item ?? defaultForm);
+    setForm(item ? { asset_name: item.asset_name, asset_type: item.asset_type, amount: item.amount } : defaultForm);
   }, [item, isOpen]);
 
   if (!isOpen) return null;
@@ -24,12 +18,7 @@ const PortfolioModal = ({ isOpen, onClose, onSave, item }) => {
 
   const submit = (e) => {
     e.preventDefault();
-    onSave({
-      ...form,
-      quantity: Number(form.quantity),
-      buyPrice: Number(form.buyPrice),
-      currentPrice: Number(form.currentPrice),
-    });
+    onSave({ ...form, amount: Number(form.amount) });
   };
 
   return (
@@ -59,61 +48,35 @@ const PortfolioModal = ({ isOpen, onClose, onSave, item }) => {
             <label className="block text-xs font-medium text-slate-500 mb-1.5">Asset Name</label>
             <input
               className="field"
-              placeholder="e.g. Reliance Industries"
-              value={form.name}
-              onChange={set("name")}
+              placeholder="e.g. Nippon India Flexi Cap Fund"
+              value={form.asset_name}
+              onChange={set("asset_name")}
               required
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1.5">Asset Type</label>
-            <select className="field" value={form.type} onChange={set("type")}>
+            <select className="field" value={form.asset_type} onChange={set("asset_type")}>
               {ASSET_TYPES.map((t) => (
                 <option key={t}>{t}</option>
               ))}
             </select>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Quantity</label>
-              <input
-                type="number"
-                className="field"
-                placeholder="0"
-                min="0"
-                value={form.quantity}
-                onChange={set("quantity")}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Buy Price</label>
-              <input
-                type="number"
-                className="field"
-                placeholder="₹"
-                min="0"
-                value={form.buyPrice}
-                onChange={set("buyPrice")}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                Current Price
-              </label>
-              <input
-                type="number"
-                className="field"
-                placeholder="₹"
-                min="0"
-                value={form.currentPrice}
-                onChange={set("currentPrice")}
-                required
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              Invested Amount (₹)
+            </label>
+            <input
+              type="number"
+              className="field"
+              placeholder="e.g. 50000"
+              min="0"
+              value={form.amount}
+              onChange={set("amount")}
+              required
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

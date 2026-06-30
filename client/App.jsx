@@ -4,6 +4,7 @@ import Dashboard from "./Pages/Dashboard";
 import Expenses from "./Pages/Expenses";
 import Goals from "./Pages/Goals";
 import Portfolio from "./Pages/Portfolio";
+import Profile from "./Pages/Profile";
 import ProtectedRoute from "./Routes/ProtectedRoute";
 
 const App = () => {
@@ -44,6 +45,15 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Portfolio />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

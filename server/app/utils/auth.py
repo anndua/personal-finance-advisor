@@ -1,15 +1,18 @@
 import hashlib
 import os
 from datetime import datetime, timedelta
-from jose import jwt
+from pathlib import Path
+from jose import jwt, JWTError
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, JWTError
-load_dotenv()
+
+# Resolve .env from project root regardless of where uvicorn is launched
+_env_path = Path(__file__).resolve().parents[3] / ".env"
+load_dotenv(dotenv_path=_env_path)
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
+ALGORITHM  = os.getenv("ALGORITHM")
 
 
 def hash_password(password: str):

@@ -90,7 +90,7 @@ const Auth = () => {
           </div>
         </div>
 
-        <p className="text-brand-300 text-sm">© 2025 FinlyAI</p>
+        <p className="text-brand-300 text-sm">© 2026 FinlyAI</p>
       </div>
 
       {/* Right panel — forms */}
