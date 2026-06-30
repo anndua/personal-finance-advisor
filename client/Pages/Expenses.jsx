@@ -28,7 +28,7 @@ const Expenses = () => {
   const handleSave = async (expense) => {
     try {
       if (editingExpense) {
-        await expenseAPI.update(editingExpense.id, expense);
+        await expenseAPI.update(editingExpense._id, expense);
         toast.success("Expense updated");
       } else {
         await expenseAPI.create(expense);
@@ -54,7 +54,7 @@ const Expenses = () => {
   };
 
   const filtered = expenses.filter((e) =>
-    e.title.toLowerCase().includes(search.toLowerCase())
+    (e.title || e.description || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const openAdd = () => {

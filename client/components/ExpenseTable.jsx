@@ -44,7 +44,7 @@ const ExpenseTable = ({ expenses, onEdit, onDelete }) => {
           <tbody className="divide-y divide-slate-50">
             {expenses.map((expense) => (
               <tr
-                key={expense.id}
+                key={expense._id}
                 className="hover:bg-slate-50 transition-colors"
               >
                 <td className="px-5 py-4 font-medium text-slate-700">
@@ -74,7 +74,7 @@ const ExpenseTable = ({ expenses, onEdit, onDelete }) => {
                       <FaEdit size={13} />
                     </button>
                     <button
-                      onClick={() => onDelete(expense.id)}
+                      onClick={() => onDelete(expense._id)}
                       className="w-8 h-8 rounded-lg bg-red-50 text-red-400 hover:bg-red-100
                                  flex items-center justify-center transition"
                       aria-label="Delete"

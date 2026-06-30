@@ -1,7 +1,9 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class GoalCreate(BaseModel):
-    title: str
-    target_amount: float
-    current_amount: float
+    name: str                          # frontend sends "name"
+    targetAmount: float                # frontend sends "targetAmount"
+    currentAmount: float = 0.0        # frontend sends "currentAmount"
+    deadline: Optional[str] = None    # frontend sends "deadline" (date string)

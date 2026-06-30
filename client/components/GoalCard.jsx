@@ -27,7 +27,7 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
             <FaEdit size={13} />
           </button>
           <button
-            onClick={() => onDelete(goal.id)}
+            onClick={() => onDelete(goal._id)}
             className="w-8 h-8 rounded-lg bg-red-50 text-red-400 hover:bg-red-100
                        flex items-center justify-center transition"
             aria-label="Delete goal"

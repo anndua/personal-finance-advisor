@@ -27,7 +27,7 @@ const Goals = () => {
   const saveGoal = async (goal) => {
     try {
       if (editing) {
-        await goalAPI.update(editing.id, goal);
+        await goalAPI.update(editing._id, goal);
         toast.success("Goal updated");
       } else {
         await goalAPI.create(goal);
@@ -80,7 +80,7 @@ const Goals = () => {
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {goals.map((goal) => (
             <GoalCard
-              key={goal.id}
+              key={goal._id}
               goal={goal}
               onEdit={(g) => {
                 setEditing(g);
