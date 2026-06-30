@@ -33,8 +33,8 @@ api.interceptors.request.use(
  * AUTH APIs
  */
 export const authAPI = {
-  login: (data) => api.post("/login", data),
-  register: (data) => api.post("/register", data),
+  login: (data) => api.post("/auth/login", data),
+  register: (data) => api.post("/auth/register", data),
 };
 
 /**

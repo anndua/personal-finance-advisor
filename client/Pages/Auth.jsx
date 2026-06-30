@@ -14,22 +14,43 @@ const Auth = () => {
     e.preventDefault();
     try {
       const res = await authAPI.login(login);
+      // Backend returns 200 with an error message if credentials are wrong
+      if (!res.data.access_token) {
+        toast.error(res.data.message || "Invalid email or password");
+        return;
+      }
       localStorage.setItem("token", res.data.access_token);
       toast.success("Welcome back!");
       navigate("/dashboard");
-    } catch {
-      toast.error("Invalid email or password");
+    } catch (err) {
+      console.error("Login error:", err);
+      const msg =
+        err?.response?.data?.detail ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Login failed";
+      toast.error(msg);
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await authAPI.register(register);
+      const res = await authAPI.register(register);
+      if (res.data.message !== "User registered successfully") {
+        toast.error(res.data.message || "Registration failed");
+        return;
+      }
       toast.success("Account created — please sign in");
       setTab("login");
-    } catch {
-      toast.error("Registration failed");
+    } catch (err) {
+      console.error("Register error:", err);
+      const msg =
+        err?.response?.data?.detail ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Registration failed";
+      toast.error(msg);
     }
   };
 
